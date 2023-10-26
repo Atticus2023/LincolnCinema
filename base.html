@@ -12,35 +12,45 @@
     />
   </head>
   <body>
-    <header>
-      <nav>
-        <a href="/"><h1>Lin Cinema</h1></a>
-        
-        <ul class="nav flex-column">
-          <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="#"><i class="fa-solid fa-film"></i> Movie</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#"><i class="fa-solid fa-ticket fa-beat" style="color: #1f4284"></i> Ticket</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#"><i class="fa-solid fa-landmark"></i> Hall</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link disabled" aria-disabled="true">Disabled</a>
-          </li>
-        </ul>
-      </nav>
-    </header>
-    <main>
-      <div class="search">
-        <form class="d-flex" role="search">
-        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-        <button class="btn btn-outline-success" type="submit">Search</button>
-      </form>
+    <div class="container-fluid bg-dark">
+      <div class="row">
+        <div class="col-3">
+          <header class="">
+            <nav class="container mt-3 ">
+              <a class="link-offset-2 link-underline link-underline-opacity-0 text-danger  mb-5" href="#"
+                ><span style="font-size: 46px;"><i class="fa-solid fa-clapperboard "></i> Lin Cinema</span></a
+              >
+              <ul class="nav flex-column mt-4">
+                <li class="nav-item ">
+                  <a class="nav-link active text-light" aria-current="page" href="#"><i class="fa-solid fa-film" ></i> Movie</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link  text-white-50" href="#"
+                    ><i class="fa-solid fa-ticket fa-beat" ></i> Ticket</a
+                  >
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link text-white-50" href="#"><i class="fa-solid fa-landmark"></i> Hall</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link disabled text-white-50" aria-disabled="true">Disabled</a>
+                </li>
+              </ul>
+            </nav>
+          </header>
+        </div>
+        <div class="col-9">
+          <main class="mt-4">
+            <div class="search">
+              <form class="d-flex" role="search">
+                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
+                <button class="btn btn-outline-success" type="submit">Search</button>
+              </form>
+            </div>
+          </main>
+        </div>
       </div>
-    </main>
-
+    </div>
     <script src="https://kit.fontawesome.com/512cba439e.js" crossorigin="anonymous"></script>
     <script
       src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
