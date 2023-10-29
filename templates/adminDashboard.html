@@ -1,0 +1,234 @@
+{% extends 'base.html' %} {% block title %}Home{% endblock %} {% block content %}
+
+<div class="text-light" id="message"></div>
+<div class="container-fluid mt-4">
+  <div class="row">
+    <div class="col-10">
+      <form class="d-flex" role="search">        
+        <input class="form-control" id="searchInput" type="search" placeholder="Search by title" aria-label="Search" />
+        <button class="btn btn-outline-success" type="submit">Search</button>
+      </form>
+    </div>
+    <div class="col-2">
+      <div class="btn-group">
+        <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown">
+          {{ user.username }}          
+        </button>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="#">Update Profile</a></li>
+          <li><a class="dropdown-item" href="/logout">Logout</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div>
+  <select id="yearFilter">
+    <option value="">All Years</option>
+    <option value="2023">2023</option>
+    <option value="2022">2022</option>
+    <option value="2021">2021</option>
+    <option value="2020">2020</option>
+    <option value="2019">2019</option>
+    <option value="2018">2018</option>
+  </select>
+  <select id="countryFilter">
+    <option value="">All Countries</option>
+    <option value="USA">USA</option>
+    <option value="UK">UK</option>
+    <!-- Add more countries as needed -->
+  </select>
+  <select id="genreFilter">
+    <option value="">All Genres</option>
+    <option value="Action">Action</option>
+    <option value="Drama">Drama</option>
+    <!-- Add more genres as needed -->
+  </select>
+</div>
+
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addMovieModal">Add Movie</button>
+
+<div
+  class="modal fade"
+  id="addMovieModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="addMovieModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addMovieModalLabel">Add a New Movie</h5>
+        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="movieForm" method="POST">
+          <div class="form-group">
+            <label for="title">Title</label>
+            <input type="text" class="form-control" id="title" name="title" />
+          </div>
+          <div class="form-group">
+            <label for="description">Description</label>
+            <input type="text" class="form-control" id="description" name="description" />
+          </div>
+          <div class="form-group">
+            <label for="country">Country</label>
+            <input type="text" class="form-control" id="country" name="country" />
+          </div>
+          <div class="form-group">
+            <label for="language">Language</label>
+            <input type="text" class="form-control" id="language" name="language" />
+          </div>
+          <div class="form-group">
+            <label for="genre">Genre</label>
+            <input type="text" class="form-control" id="genre" name="genre" />
+          </div>
+          <div class="form-group">
+            <label for="releaseDate">Release Date</label>
+            <input type="number" class="form-control" id="releaseDate" name="releaseDate" min="1900" max="2023" step="1"/>
+          </div>
+          <div class="form-group">
+            <label for="duration">Duration</label>
+            <input type="number" class="form-control" id="duration" name="duration" />
+          </div>
+          <div class="form-group">
+            <label for="image">Upload Image</label>
+            <input type="file" class="form-control-file" id="image" name="image" />
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" id="addMovieSubmit" class="btn btn-primary">Add Movie</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="moviesListContainer me-5">
+  <ul class="moviesList">
+    {% for movie in movies %}
+    <li
+      class="moviesListItem mt-3"
+      data-year="{{ movie.releaseDate }}"
+      data-country="{{ movie.country }}"
+      data-genre="{{ movie.genre }}"
+    >
+      <div class="container">
+        <div class="row">
+          <div class="moviesListWrapper col-3">
+            <a href="{{url_for('addScreening', movieID=movie.id)}}" class="moviesListPoster">
+              <img src="{{ movie.imagePath  }}" alt="{{ movie.title }}" />
+            </a>
+          </div>
+          <div class="moviesListCopy col-8">
+            <h2 class="moviesListHeading">
+              <a href="#" class="moviesListLink movieTitle text-light">{{ movie.title }}</a>
+            </h2>
+            <p class="text-white-50">
+              <span>{{ movie.genre}}</span> <span>{{ movie.duration}}</span> <span>{{ movie.country }}</span>
+            </p>
+            <p class="text-white-50">{{ movie.description }}</p>
+          </div>
+        </div>
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %} {% block script %}
+<script>
+  function fetchMoviesAndAppendNewMovie() {
+    fetch("/getMovies") // 假设有一个后端路由用于获取电影信息
+      .then((response) => response.json())
+      .then((data) => {
+        const movieList = document.querySelector(".moviesList");
+
+        const newMovie = data[data.length - 1];
+
+        const movieItem = document.createElement("li");
+        movieItem.className = "moviesListItem";
+        movieItem.setAttribute("data-year", newMovie.releaseDate);
+        movieItem.setAttribute("data-country", newMovie.country);
+        movieItem.setAttribute("data-genre", newMovie.genre);
+
+        movieItem.innerHTML = `
+                <div class="container">
+                  <div class="row">
+                    <div class="moviesListWrapper col-3">
+                      <a href="#" class="moviesListPoster">
+                        <img src="" alt="${newMovie.title}" />
+                      </a>
+                    </div>
+                    <div class="moviesListCopy col-8">
+                      <h2 class="moviesListHeading">
+                        <a href="#" class="moviesListLink text-light">${newMovie.title}</a>
+                      </h2>
+                      <p class="text-white-50">
+                        <span>${newMovie.genre}</span> <span>${newMovie.duration}</span> <span>${newMovie.country}</span>
+                      </p>
+                      <p class="text-white-50">${newMovie.description}</p>
+                    </div>
+                  </div>
+                </div>
+            `;
+
+        movieList.appendChild(movieItem);
+      })
+      .catch((error) => console.error("Failed to fetch movies: ", error));
+  }
+
+  // 当点击 "Add Movie" 模态框中的提交按钮时，收集表单数据并发送给服务器
+  document.getElementById("addMovieSubmit").addEventListener("click", function () {
+    const title = document.getElementById("title").value;
+    const description = document.getElementById("description").value;
+    const country = document.getElementById("country").value;
+    const language = document.getElementById("language").value;
+    const genre = document.getElementById("genre").value;
+    const releaseDate = document.getElementById("releaseDate").value;
+    const duration = document.getElementById("duration").value;
+
+    const imageFileInput = document.getElementById("image");
+
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("description", description);
+    formData.append("country", country);
+    formData.append("language", language);
+    formData.append("genre", genre);
+    formData.append("releaseDate", releaseDate);
+    formData.append("duration", duration);
+
+    // 添加图片文件到 FormData
+    formData.append("image", imageFileInput.files[0]);
+    // 发送数据到服务器
+    fetch("/addMovie", {
+      method: "POST",
+      body: formData,
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const message = data.message;
+        console.log(message);
+        alert(message);
+        window.location.href = "/adminDashboard";
+      });
+  });
+</script>
+<script src="/static/js/search.js"></script>
+<script
+  src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+  integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+  crossorigin="anonymous"
+></script>
+<script
+  src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
+  integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
+  crossorigin="anonymous"
+></script>
+{% endblock %}

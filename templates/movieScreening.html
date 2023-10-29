@@ -1,0 +1,103 @@
+{% extends 'base.html' %} {% block title %}Home{% endblock %} {% block content %}
+
+<div class="container">
+  <div class="moviesListWrapper">
+    <img src="{{ movie.imagePath  }}" alt="{{ movie.title }}" />
+  </div>
+  <div class="moviesListCopy">
+    <h2 class="moviesListHeading">{{ movie.title }}</h2>
+    <p class="text-white-50">
+      <span>{{ movie.genre}}</span> <span>{{ movie.duration}}</span> <span>{{ movie.country }}</span>
+    </p>
+    <p class="text-white-50">{{ movie.description }}</p>
+  </div>
+</div>
+
+<div class="container screening">
+  <p class="title text-light">Times & Tickets</p>
+  <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+    <input
+      type="radio"
+      class="btn-check"
+      value={{
+      today
+      }}
+      name="date-button"
+      id="today-button"
+      autocomplete="off"
+      
+    />
+    <label class="btn btn-outline-primary" for="today-button"><span>Today</span></label>
+
+    <input
+      type="radio"
+      class="btn-check"
+      value={{
+      tomorrow
+      }}
+      name="date-button"
+      id="tomorrow-button"
+      autocomplete="off"
+    />
+    <label class="btn btn-outline-primary" for="tomorrow-button"><span>{{ tomorrow }}</span></label>
+
+    <input
+      type="radio"
+      class="btn-check"
+      value={{
+      day_after_tomorrow
+      }}
+      name="date-button"
+      id="day-after-tomorrow-button"
+      autocomplete="off"
+    />
+    <label class="btn btn-outline-primary" for="day-after-tomorrow-button"><span>{{ day_after_tomorrow }}</span></label>
+  </div>
+  <div class="container ticket">
+    <div class="row" id="screenings-list">
+      
+  </div>
+  </div>
+</div>
+
+<script>
+
+  const dateButtons = document.querySelectorAll('.btn-check');
+
+  const movieScreenings = {{ movie_screenings_data | tojson | safe }};
+  console.log(movieScreenings);
+
+
+  dateButtons.forEach(button => {
+  button.addEventListener('change', () => {
+    // 获取按钮上的日期
+    const selectedDate = button.value;
+
+    // 使用日期筛选screenings
+    const filteredScreenings = movieScreenings.filter(screening => screening.date === selectedDate);
+
+    // 更新页面上的screenings
+    const screeningsList = document.getElementById('screenings-list');
+    screeningsList.innerHTML = ''; // 清空原有内容
+
+    if (filteredScreenings.length === 0) {
+      screeningsList.innerHTML = '<p>No screenings available for the selected date.</p>';
+      return;
+    }
+
+    // 遍历筛选后的screenings并显示在页面上
+    const screeningsHTML = filteredScreenings.map(screening => `
+      <div class="screening-card text-light col-4">
+        <a href="/makeBooking?screeningID=${screening.screeningID}&movieID=${screening.movieID}">
+          <p class="screening-date">Date: ${screening.date}</p>
+          <p class="screening-time">Time: ${screening.startTime}</p>
+        </a>
+      </div>
+    `).join('');
+
+    // 将HTML插入到screeningsList
+    screeningsList.innerHTML = screeningsHTML;
+  });
+});
+</script>
+{% endblock %}

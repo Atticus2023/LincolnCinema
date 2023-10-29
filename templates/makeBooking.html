@@ -1,0 +1,102 @@
+{% extends 'base.html' %} {% block title %}Home{% endblock %} {% block content %}
+
+<div class="screening-card text-white-50">
+  <p>Date: {{ screening.date }}</p>
+  <p>Time: {{ screening.startTime }}</p>
+  <p>Hall: {{ screening.hall.hallID }}</p>
+  <div class="container">
+    <div class="row me-5">
+      
+        {% for seat in screening.hall.seatsList %}
+
+        <div class="col-1 text-light  p-2">
+          {% if seat.isReserved %}
+            <input type="checkbox" class="btn-check seat-checkbox" id="seat-{{ seat.id }}" autocomplete="off" disabled />
+          {% else %}
+            <input type="checkbox" class="btn-check seat-checkbox" id="seat-{{ seat.id }}" autocomplete="off" />
+          {% endif %}
+          <label class="btn btn-outline-primary" for="seat-{{ seat.id }}">Seat</label>
+        </div>
+      
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<div>
+  <button id="make-booking-button">CheckOut</button>
+</div>
+
+{% endblock %}
+{% block script %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // 在文档加载完成后执行以下代码
+
+  const seatCheckboxes = document.querySelectorAll('.seat-checkbox');
+  const makeBookingButton = document.getElementById('make-booking-button');
+  
+// 创建一个数组来存储所选座位的信息
+const selectedSeats = [];
+
+// 为每个复选框添加事件监听器
+seatCheckboxes.forEach(checkbox => {
+  checkbox.addEventListener('change', () => {
+    const seatID = checkbox.id.split('-')[1];
+    if (checkbox.checked) {
+      // 用户选择了座位，将其添加到所选座位数组中
+      selectedSeats.push(seatID);
+    } else {
+      // 用户取消选择座位，从所选座位数组中移除
+      const index = selectedSeats.indexOf(seatID);
+      if (index > -1) {
+        selectedSeats.splice(index, 1);
+      }
+    }
+  });
+});
+const urlParams = new URLSearchParams(window.location.search);
+const screeningID = urlParams.get('screeningID');
+const movieID = urlParams.get('movieID');
+
+makeBookingButton.addEventListener('click', () => {
+  if (selectedSeats.length === 0) {
+    alert('Please select at least one seat before making a booking.');
+    return; 
+  }
+  const data = {
+    selectedSeats: selectedSeats,
+    screeningID: screeningID,
+    movieID: movieID    
+  };
+  // 发送 POST 请求到后端
+  fetch('/submitBooking', {
+    method: 'POST',  
+    headers: {
+      'Content-Type': 'application/json', 
+    },
+    body: JSON.stringify(data),  
+  })
+    .then((response) => {
+      if (response.ok) {
+        return response.json();
+      } else {        
+        console.error('Failed to make booking:', response.status);
+      }
+    })
+    .then((data) => {
+      if (data && data.bookingID) {
+        // 构建 /payment URL 并进行页面跳转
+        const paymentURL = `/payment?bookingID=${data.bookingID}`;
+        window.location.href = paymentURL;
+      } else {
+        console.error('Booking ID not found in the response.');
+      }
+    })
+    .catch((error) => {
+      console.error('Error making booking:', error);
+    });
+});
+});
+</script>
+{% endblock %}

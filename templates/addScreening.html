@@ -1,0 +1,47 @@
+{% extends 'base.html' %} {% block title %}Add Screening{% endblock %} {% block content %}
+<div class="row g-5">
+  <div class="col-md-7 col-lg-8">
+    <h4 class="mb-3">Billing address</h4>
+    <form class="needs-validation" action="/addScreening/{{ movieID }}" method="POST">
+      <div class="row g-3">
+        <div class="col-12">
+          <label for="date" class="form-label">Date</label>
+          <input type="date" class="form-control" id="date" name="date" required  />
+          <div class="invalid-feedback">Date is required.</div>
+        </div>
+
+        <div class="col-12">
+          <label for="startTime" class="form-label">Start Time</label>
+          <input type="time" class="form-control" id="startTime" name="startTime" required />
+          <div class="invalid-feedback">Start Time is required.</div>
+        </div>
+
+        <div class="col-12">
+          <label for="endTime" class="form-label">End Time</label>
+          <input type="time" class="form-control" id="endTime" name="endTime" required  />
+          <div class="invalid-feedback">End Time is required.</div>
+        </div>
+
+        <div class="col-12">
+          <label for="hallID" class="form-label">Hall</label>
+          <select name="hallID" id="hallID">
+            <option value="1">Hall1</option>
+            <option value="2">Hall2</option>
+            <option value="3">Hall3</option>
+            <option value="4">Hall4</option>
+          </select>
+        </div>
+
+        <div class="col-12">
+          <label for="price" class="form-label">Price </label>
+          <input type="text" class="form-control" id="price" name="price" required  />
+        </div>
+
+        <hr class="my-4" />
+      </div>
+
+      <button class="w-100 btn btn-primary btn-lg" type="submit">Add Screening</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,164 @@
+{% extends 'base.html' %} {% block title %}Home{% endblock %} {% block content %}
+
+<div class="container">
+  <div class="row g-5">
+    <div class="col-md-5 col-lg-4 order-md-last">
+      <h4 class="d-flex justify-content-between align-items-center mb-3">
+        <span class="text-primary">Your cart</span>
+      </h4>
+      <ul class="list-group mb-3">
+        <li class="list-group-item d-flex justify-content-between">
+          <span>Total </span>
+          <span class="amount"><strong>${{amount}}</strong></span>
+        </li>
+      </ul>
+
+      <form class="card p-2">
+        <div class="input-group">
+          <input type="text" class="form-control promoCode" placeholder="Promo code" />
+          <button type="button" class="btn btn-secondary promoSubmit">Redeem</button>
+        </div>
+      </form>
+    </div>
+    <div class="col-md-7 col-lg-8">
+      <h4 class="mb-3">Payment</h4>
+      <form class="needs-validation was-validated" novalidate="">
+        <hr class="my-4" />
+        <div class="my-3">
+          <div class="form-check">
+            <input
+              id="credit"
+              name="paymentMethod"
+              type="radio"
+              class="form-check-input"
+              value="credit"
+              checked=""
+              required=""
+            />
+            <label class="form-check-label" for="credit">Credit card</label>
+          </div>
+          <div class="form-check">
+            <input id="debit" name="paymentMethod" type="radio" class="form-check-input" value="debit" required="" />
+            <label class="form-check-label" for="debit">Debit card</label>
+          </div>
+          <div class="form-check">
+            <input id="cash" name="paymentMethod" type="radio" class="form-check-input" value="cash" required="" />
+            <label class="form-check-label" for="paypal">Cash</label>
+          </div>
+        </div>
+
+        <hr class="my-4" />
+
+        <button class="w-100 btn btn-primary btn-lg checkoutButton" type="button">Continue to checkout</button>
+      </form>
+    </div>
+  </div>
+
+  <footer class="my-5 pt-5 text-body-secondary text-center text-small">
+    <p class="mb-1">© 2017–2023 Company Name</p>
+    <ul class="list-inline">
+      <li class="list-inline-item"><a href="#">Privacy</a></li>
+      <li class="list-inline-item"><a href="#">Terms</a></li>
+      <li class="list-inline-item"><a href="#">Support</a></li>
+    </ul>
+  </footer>
+</div>
+
+<div class="booking" data-booking-id="{{ booking.id }}" data-customer-username="{{ booking.customer.username }}" data-screening-id="{{ booking.screening.id }}" ></div>
+<div class="booking">
+  {% for seat in booking.bookingseats %}
+    <div class="booking-seat" data-seat-id="{{ seat.id }}"></div>
+  {% endfor %}
+</div>
+{% endblock %} {% block script %}
+<script>
+  const promoCodeInput = document.querySelector(".promoCode");
+  const redeemButton = document.querySelector(".promoSubmit");
+  const checkoutButton = document.querySelector('.checkoutButton')
+  const amount = document.querySelector(".amount");
+  const totalAmount = parseFloat(document.querySelector(".amount").textContent.slice(1));
+
+  redeemButton.addEventListener("click", function (event) {
+    const enteredPromoCode = promoCodeInput.value;
+    
+    // 发送 promo code 到后端进行校验
+    fetch("/validatePromoCode", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ promoCode: enteredPromoCode, totalAmount: totalAmount }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.valid) {
+          // 如果 promo code 有效，更新金额
+          amount.textContent = `$${data.discountedAmount}`;
+        } else {
+          alert("Invalid promo code. Please try again.");
+        }
+      })
+      .catch((error) => {
+        console.error("Error validating promo code:", error);
+      });
+  });
+
+  checkoutButton.addEventListener("click", function (event) {
+    const paymentMethodElements = document.querySelectorAll('input[name="paymentMethod"]');
+    let selectedPaymentMethod = ''; 
+    paymentMethodElements.forEach((element) => {
+        if (element.checked) {
+            selectedPaymentMethod = element.value;
+        }
+    });
+    paymentMethodElements.forEach((element) => {
+        element.addEventListener('change', (event) => {
+            selectedPaymentMethod = event.target.value; // 更新用户选择的支付方式
+        });
+    });
+    
+    const bookingSeatsElements = document.querySelectorAll('.booking-seat');
+    const bookingSeats = [];
+    bookingSeatsElements.forEach((element) => {
+      const seatId = element.getAttribute('data-seat-id');
+      bookingSeats.push({ id: seatId });
+    });
+    const enteredPromoCode = promoCodeInput.value;
+    const bookingElement = document.querySelector('.booking');
+    const bookingId = bookingElement.getAttribute('data-booking-id');
+    const customerName = bookingElement.getAttribute('data-customer-username');
+    const screeningId = bookingElement.getAttribute('data-screening-id');
+
+    const paymentData = {
+      totalAmount: totalAmount,
+      promoCode: enteredPromoCode,
+      bookingId: bookingId,
+      customerName: customerName,
+      screeningId: screeningId,
+      selectedPaymentMethod: selectedPaymentMethod,
+      bookingSeats: bookingSeats, 
+    };
+        
+    fetch("/checkout", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(paymentData),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          // 如果 promo code 有效，更新金额
+          window.location.href = '/customerDashboard';
+        } else {
+          console.error('Payment failed:', data.error);
+        }
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  });
+</script>
+
+{% endblock %}
