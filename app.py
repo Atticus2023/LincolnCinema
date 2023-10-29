@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify, session
+from flask import Flask, render_template, request, redirect, url_for, jsonify, session, flash
 from datetime import datetime, timedelta
 import os
 
@@ -15,6 +15,13 @@ ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png', 'gif'}
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def filterData():
+    movies = controller.movies
+    unique_countries = list(set(movie.country for movie in movies))
+    unique_years = list(set(movie.releaseDate for movie in movies))
+    unique_genres = list(set(movie.genre for movie in movies))
+    return movies,unique_countries,unique_years,unique_genres
 
 @app.route('/')
 def index():
@@ -82,6 +89,7 @@ def login():
 @app.route('/logout')
 def logout():
     session.clear()
+    controller.logout
     return redirect(url_for('index'))
 
 @app.route('/search', methods=['GET'])
@@ -99,10 +107,11 @@ def search_movies():
 @app.route('/adminDashboard')
 def adminDashboard():
     if 'username' in session:
+        movies, unique_countries, unique_years, unique_genres = filterData()
         username = session['username']        
         user = controller.getUserByUsername(username) 
-    movies = controller.movies
-    return render_template('adminDashboard.html', user=user,movies=movies)
+        movies = controller.movies
+        return render_template('adminDashboard.html', user=user,movies=movies, unique_countries=unique_countries,unique_years=unique_years,unique_genres=unique_genres)
 
 
 @app.route('/addMovie', methods=['POST'])
@@ -128,7 +137,8 @@ def add_movie():
         return jsonify({'error': 'Failed to add movie', 'details': str(e)}), 400
 
 @app.route('/addScreening/<movieID>', methods=['GET','POST'])
-def addScreening(movieID):    
+def addScreening(movieID):
+    
     movie = controller.getMovieByID(movieID)
     if movie:        
         if request.method == 'POST':
@@ -146,29 +156,29 @@ def addScreening(movieID):
 
 @app.route('/staffDashboard')
 def staffDashboard():
-    movies = controller.movies
-    return render_template('staffDashboard.html', movies=movies)
+    movies, unique_countries, unique_years, unique_genres = filterData()
+    return render_template('staffDashboard.html', movies=movies, unique_countries=unique_countries,unique_years=unique_years,unique_genres=unique_genres)
 
 @app.route('/customerDashboard')
 def customer_dashboard():
     if 'username' in session:
         username = session['username']        
         user = controller.getUserByUsername(username)        
-        movies = controller.movies
+        movies, unique_countries, unique_years, unique_genres = filterData()
         if user:           
-            return render_template('customerDashboard.html', user=user, movies=movies)
+            return render_template('customerDashboard.html', user=user, movies=movies, unique_countries=unique_countries,unique_years=unique_years,unique_genres=unique_genres)
         else:
             return "User not found"
     else:
         return redirect('/login')
 
-@app.route('/movieScreening/<movieID>')
-def movieScreening(movieID):    
-    if 'username' in session:
+@app.route('/movieScreening', methods=['GET'])
+def movieScreening():    
+    if 'username' in session:        
         username = session['username']        
-        user = controller.getUserByUsername(username)    
-        movie = controller.getMovieByID(movieID)
-
+        user = controller.getUserByUsername(username)  
+        movieID = request.args.get("movieID")  
+        movie = controller.getMovieByID(movieID)        
         movie_screenings_data = []
         for screening in movie.movieScreenings:
             screening_data = {
@@ -198,7 +208,8 @@ def movieScreening(movieID):
             tomorrow_str = tomorrow.strftime('%Y-%m-%d')
             day_after_tomorrow = today + timedelta(days=2)
             day_after_tomorrow_str = day_after_tomorrow.strftime('%Y-%m-%d')
-            return render_template('movieScreening.html', user=user, movie=movie, movie_screenings_data=movie_screenings_data,today=today_str, tomorrow=tomorrow_str, day_after_tomorrow=day_after_tomorrow_str)
+            
+            return render_template('movieScreening.html', user=user,  movie=movie, movie_screenings_data=movie_screenings_data,today=today_str, tomorrow=tomorrow_str, day_after_tomorrow=day_after_tomorrow_str)
         else:
             return "User not found"
     else:
@@ -212,7 +223,7 @@ def makeBooking():
         movieID = request.args.get('movieID')
         user = controller.getUserByUsername(username)  
         movie = controller.getMovieByID(movieID)
-        screening = controller.getScreeningByID(screeningID)        
+        screening = controller.getScreeningByID(screeningID) 
 
         return render_template('makeBooking.html', user=user, movie=movie, screening=screening)
     else:
@@ -246,7 +257,7 @@ def payment():
     if 'username' in session:
         bookingID = request.args.get('bookingID')
         booking = controller.getBookingByID(bookingID)
-        amount = float(booking.screening.price) * len(booking.bookingseats)
+        amount = float(booking.screening.price) * len(booking.bookingseats)        
 
         return render_template('payment.html', booking=booking, amount=amount)
     else:
@@ -289,5 +300,17 @@ def checkout():
     
     return jsonify({'success': True, 'message': 'Payment successful'}), 200
 
+@app.route('/bookingList')
+def bookingList():
+    if 'username' in session:
+        username = session['username'] 
+        
+        user = controller.getUserByUsername(username)
+        bookingList = user.bookingList
+        print(bookingList)
+        if bookingList:
+            return render_template('bookingList.html', bookingList=bookingList)
+        flash('You have not book any screening', 'info')
+        return redirect('/customerDashboard')
 if __name__ == '__main__':
     app.run()
