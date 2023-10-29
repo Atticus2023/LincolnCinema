@@ -217,9 +217,7 @@ class LincolnCinemaController:
   
   def getMovieByID(self,movieID):
     for movie in self.movies:
-        # movie_id = int(movie.id.strip())
         requested_id = int(movieID.strip())
-       
         if movie.id == requested_id:           
             return movie
     return None

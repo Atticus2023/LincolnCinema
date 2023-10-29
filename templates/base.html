@@ -40,46 +40,7 @@
           </header>
         </div>
         <div class="col-9">
-          <div class="container-fluid mt-4">
-            <div class="row">
-              <div class="col-10">
-                <form class="d-flex" role="search">        
-                  <input class="form-control" id="searchInput" type="search" placeholder="Search by title" aria-label="Search" />
-                  
-                </form>
-                <div class="container d-flex justify-content-start">
-                  <div class="me-3">
-                    <label for="country" class="form-label text-light">Country</label>
-                      <select class="form-select" id="countryFilter" >
-                        <option value="">Choose...</option>                        
-                        {% for country in unique_countries %}
-                            <option>{{country}}</option>
-                        {% endfor %}
-                      </select>                    
-                  </div>
-                  <div class="me-3">
-                    <label for="country" class="form-label text-light">Genre</label>
-                      <select class="form-select" id="genreFilter" >
-                        <option value="">Choose...</option>
-                        {% for genre in unique_genres %}
-                            <option>{{ genre}}</option>
-                        {% endfor %}
-                      </select>                    
-                  </div>
-                  <div class="me-3">
-                    <label for="country" class="form-label text-light">ReleaseDate</label>
-                      <select class="form-select" id="yearFilter" >
-                        <option value="">Choose...</option>
-                        {% for releaseDate in unique_years %}
-                            <option>{{releaseDate}}</option>
-                        {% endfor %}
-                      </select>                    
-                  </div>
-                </div>
-              </div>
-              {% block icon %}{% endblock %}              
-            </div>
-          </div>
+          
           {% block content %}{% endblock %}          
         </div>
       </div>
