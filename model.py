@@ -68,24 +68,28 @@ class Movie(BaseModel):
   
   def movieAddScreening(self, screening):
     if screening not in self.movieScreenings:
-      self.movieScreenings.append(screening)
-     
+      self.movieScreenings.append(screening)     
 
 class Screening(BaseModel):
-  def __init__(self, date, startTime, endTime, hall, price):
-    super().__init__()   
+  def __init__(self,movieTitle, date, startTime, endTime, hall, price):
+    super().__init__()  
+    self.movieTitle = movieTitle 
     self.date = date
     self.startTime = startTime
     self.endTime = endTime
     self.hall = hall
     self.price = price
+    self.seats = [Seat(isReserved=False) for _ in range(hall.capacity)]
 
-class Hall:
+class Hall():
   def __init__(self, hallID, capacity):
     self.hallID = hallID
     self.capacity = capacity
-    self.seatsList = [Seat(isReserved=False) for _ in range(capacity)]
+    self.hallScreenings = []  
 
+  def hallAddScreening(self, screening):
+    if screening not in self.hallScreenings:
+      self.hallScreenings.append(screening)
 class Seat(BaseModel):
   def __init__(self,  isReserved): 
     super().__init__()      

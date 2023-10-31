@@ -122,7 +122,7 @@
       <div class="container">
         <div class="row">
           <div class="moviesListWrapper col-3">
-            <a href="{{url_for('addScreening', movieID=movie.id)}}" class="moviesListPoster">
+            <a href="{{url_for('addScreening', movieTitle=movie.title)}}" class="moviesListPoster">
               <img src="{{ movie.imagePath  }}" alt="{{ movie.title }}" />
             </a>
           </div>
