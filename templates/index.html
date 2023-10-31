@@ -1,5 +1,14 @@
 {% extends 'base.html' %} {% block title %}Home{% endblock %} 
 {% block content %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <ul class="flash-messages text-light">
+      {% for category, message in messages %}
+        <li class="{{ category }}">{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+  {% endwith %}
 <div class="row mt-4">
 <div class="col-10">
   <form class="d-flex" role="search">        
@@ -157,7 +166,7 @@
       <div class="container">
         <div class="row">
           <div class="moviesListWrapper col-3">
-            <a href="{{url_for('addScreening', movieID=movie.id)}}" class="moviesListPoster">
+            <a href="/movieScreening?movieID={{ movie.id }}" class="moviesListPoster">
               <img src="{{ movie.imagePath  }}" alt="{{ movie.title }}" />
             </a>
           </div>

@@ -11,56 +11,56 @@
   {% endif %}
   {% endwith %}
  <div class="container-fluid mt-4">
-            <div class="row">
-              <div class="col-10">
-                <form class="d-flex" role="search">        
-                  <input class="form-control" id="searchInput" type="search" placeholder="Search by title" aria-label="Search" />
-                  
-                </form>
-                <div class="container d-flex justify-content-start">
-                  <div class="me-3">
-                    <label for="country" class="form-label text-light">Country</label>
-                      <select class="form-select" id="countryFilter" >
-                        <option value="">Choose...</option>                        
-                        {% for country in unique_countries %}
-                            <option>{{country}}</option>
-                        {% endfor %}
-                      </select>                    
-                  </div>
-                  <div class="me-3">
-                    <label for="country" class="form-label text-light">Genre</label>
-                      <select class="form-select" id="genreFilter" >
-                        <option value="">Choose...</option>
-                        {% for genre in unique_genres %}
-                            <option>{{ genre}}</option>
-                        {% endfor %}
-                      </select>                    
-                  </div>
-                  <div class="me-3">
-                    <label for="country" class="form-label text-light">ReleaseDate</label>
-                      <select class="form-select" id="yearFilter" >
-                        <option value="">Choose...</option>
-                        {% for releaseDate in unique_years %}
-                            <option>{{releaseDate}}</option>
-                        {% endfor %}
-                      </select>                    
-                  </div>
-                </div>
-              </div>
-              <div class="col-2">
-                <div class="btn-group">
-                  <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown">
-                    {{ user.username }}          
-                  </button>
-                  <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="#">Update Profile</a></li>
-                    <li><a class="dropdown-item" href="/bookingList">Booking List</a></li>
-                    <li><a class="dropdown-item" href="/logout">Logout</a></li>
-                  </ul>
-                </div>
-              </div>             
-            </div>
-          </div>
+  <div class="row">
+    <div class="col-10">
+      <form class="d-flex" role="search">        
+        <input class="form-control" id="searchInput" type="search" placeholder="Search by title" aria-label="Search" />
+        
+      </form>
+      <div class="container d-flex justify-content-start">
+        <div class="me-3">
+          <label for="country" class="form-label text-light">Country</label>
+            <select class="form-select" id="countryFilter" >
+              <option value="">Choose...</option>                        
+              {% for country in unique_countries %}
+                  <option>{{country}}</option>
+              {% endfor %}
+            </select>                    
+        </div>
+        <div class="me-3">
+          <label for="country" class="form-label text-light">Genre</label>
+            <select class="form-select" id="genreFilter" >
+              <option value="">Choose...</option>
+              {% for genre in unique_genres %}
+                  <option>{{ genre}}</option>
+              {% endfor %}
+            </select>                    
+        </div>
+        <div class="me-3">
+          <label for="country" class="form-label text-light">ReleaseDate</label>
+            <select class="form-select" id="yearFilter" >
+              <option value="">Choose...</option>
+              {% for releaseDate in unique_years %}
+                  <option>{{releaseDate}}</option>
+              {% endfor %}
+            </select>                    
+        </div>
+      </div>
+    </div>
+    <div class="col-2">
+      <div class="btn-group">
+        <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown">
+          {{ user.username }}          
+        </button>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="#">Update Profile</a></li>
+          <li><a class="dropdown-item" href="/bookingList">Booking List</a></li>
+          <li><a class="dropdown-item" href="/logout">Logout</a></li>
+        </ul>
+      </div>
+    </div>             
+  </div>
+ </div>
 
 <div class="moviesListContainer me-5">
   <ul class="moviesList">

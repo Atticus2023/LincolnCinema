@@ -136,23 +136,22 @@ def add_movie():
     except Exception as e:
         return jsonify({'error': 'Failed to add movie', 'details': str(e)}), 400
 
-@app.route('/addScreening/<movieID>', methods=['GET','POST'])
-def addScreening(movieID):
-    
-    movie = controller.getMovieByID(movieID)
-    if movie:        
-        if request.method == 'POST':
-            date = request.form.get('date')
-            startTime = request.form.get('startTime')
-            endTime = request.form.get('endTime')
-            hallID = request.form.get('hallID')
-            hall = controller.getHallByID(hallID)
-            price = request.form.get('price')            
+@app.route('/addScreening/<movieTitle>', methods=['GET','POST'])
+def addScreening(movieTitle):    
+    movieTitle = request.args.get('movieTitle')        
+    if request.method == 'POST':
+        date = request.form.get('date')
+        startTime = request.form.get('startTime')
+        endTime = request.form.get('endTime')
+        hallID = request.form.get('hallID')            
+        price = request.form.get('price')            
 
-            controller.addScreening(movie,date,startTime, endTime, hall, price)
+        result = controller.addScreening(movieTitle,date,startTime, endTime, hallID, price)
+        if result:
+            flash('Add screening successfully!', 'info')
             return redirect(url_for('adminDashboard'))
-    
-    return render_template('addScreening.html', movieID = movieID)
+
+    return render_template('addScreening.html', movieTitle = movieTitle)
 
 @app.route('/staffDashboard')
 def staffDashboard():
@@ -173,48 +172,69 @@ def customer_dashboard():
         return redirect('/login')
 
 @app.route('/movieScreening', methods=['GET'])
-def movieScreening():    
-    if 'username' in session:        
-        username = session['username']        
-        user = controller.getUserByUsername(username)  
-        movieID = request.args.get("movieID")  
-        movie = controller.getMovieByID(movieID)        
-        movie_screenings_data = []
-        for screening in movie.movieScreenings:
-            screening_data = {
-                "movieID": movieID,
-                "screeningID": screening.id,
-                "date": screening.date,
-                "startTime": screening.startTime,
-                "endTime": screening.endTime,
-                "hall": {
-                    "hallID": screening.hall.hallID,
-                    "capacity": screening.hall.capacity,
-                    "seats": [
-                        {
-                            "seatID": seat.id,
-                            "isReserved": seat.isReserved
-                        }
-                        for seat in screening.hall.seatsList
-                    ]
-                }
+def movieScreening(): 
+    movieID = request.args.get("movieID")  
+    movie = controller.getMovieByID(movieID)        
+    movie_screenings_data = []
+    for screening in movie.movieScreenings:
+        screening_data = {
+            "movieID": movieID,
+            "screeningID": screening.id,
+            "date": screening.date,
+            "startTime": screening.startTime,
+            "endTime": screening.endTime,
+            "hall": {
+                "hallID": screening.hall.hallID,
+                "capacity": screening.hall.capacity                
             }
-            movie_screenings_data.append(screening_data)
-
-        if user:           
-            today = datetime.now().date()
-            today_str = today.strftime('%Y-%m-%d')
-            tomorrow = today + timedelta(days=1)
-            tomorrow_str = tomorrow.strftime('%Y-%m-%d')
-            day_after_tomorrow = today + timedelta(days=2)
-            day_after_tomorrow_str = day_after_tomorrow.strftime('%Y-%m-%d')
+        }
+        movie_screenings_data.append(screening_data)
             
-            return render_template('movieScreening.html', user=user,  movie=movie, movie_screenings_data=movie_screenings_data,today=today_str, tomorrow=tomorrow_str, day_after_tomorrow=day_after_tomorrow_str)
-        else:
-            return "User not found"
-    else:
-        return redirect('/login')
+    today = datetime.now().date()
+    today_str = today.strftime('%Y-%m-%d')
+    tomorrow = today + timedelta(days=1)
+    tomorrow_str = tomorrow.strftime('%Y-%m-%d')
+    day_after_tomorrow = today + timedelta(days=2)
+    day_after_tomorrow_str = day_after_tomorrow.strftime('%Y-%m-%d')
     
+    return render_template('movieScreening.html',   movie=movie, movie_screenings_data=movie_screenings_data,today=today_str, tomorrow=tomorrow_str, day_after_tomorrow=day_after_tomorrow_str)
+    
+
+@app.route('/hallScreening', methods=['GET'])
+def hallScreening():  
+    hallID = request.args.get("hallID")  
+    hall = controller.getHallByID(hallID)        
+    hall_screenings_data = []
+    for screening in hall.hallScreenings:
+        screening_data = {
+            "hallID": hallID,
+            "screeningID": screening.id,
+            "date": screening.date,
+            "startTime": screening.startTime,
+            "endTime": screening.endTime,
+            "hall": {
+                "hallID": screening.hall.hallID,
+                "capacity": screening.hall.capacity,
+                "seats": [
+                    {
+                        "seatID": seat.id,
+                        "isReserved": seat.isReserved
+                    }
+                    for seat in screening.hall.seatsList
+                ]
+            }
+        }
+        hall_screenings_data.append(screening_data)
+            
+    today = datetime.now().date()
+    today_str = today.strftime('%Y-%m-%d')
+    tomorrow = today + timedelta(days=1)
+    tomorrow_str = tomorrow.strftime('%Y-%m-%d')
+    day_after_tomorrow = today + timedelta(days=2)
+    day_after_tomorrow_str = day_after_tomorrow.strftime('%Y-%m-%d')
+    
+    return render_template('movieScreening.html',   hall=hall, hall_screenings_data=hall_screenings_data,today=today_str, tomorrow=tomorrow_str, day_after_tomorrow=day_after_tomorrow_str)
+
 @app.route('/makeBooking', methods=['GET'])
 def makeBooking():
     if 'username' in session:
@@ -227,7 +247,8 @@ def makeBooking():
 
         return render_template('makeBooking.html', user=user, movie=movie, screening=screening)
     else:
-        return redirect('/login')
+        flash('You have not login', 'info')
+        return redirect('/')
         
 @app.route('/submitBooking', methods=['POST'])
 def submit_booking():
@@ -238,7 +259,7 @@ def submit_booking():
         movieID = data.get('movieID')
         selectedSeatsList = []
         for seatID in selectedSeats:
-            seat = controller.getSeatByID(seatID)
+            seat = controller.getSeatByID(seatID,screeningID)
             selectedSeatsList.append(seat)
 
         username = session['username']
@@ -261,7 +282,8 @@ def payment():
 
         return render_template('payment.html', booking=booking, amount=amount)
     else:
-        return redirect('/login')
+        flash('You have not login', 'info')
+        return redirect('/')
     
 @app.route('/validatePromoCode', methods=['POST'])
 def validatePromoCode():
@@ -307,10 +329,22 @@ def bookingList():
         
         user = controller.getUserByUsername(username)
         bookingList = user.bookingList
-        print(bookingList)
+        
         if bookingList:
             return render_template('bookingList.html', bookingList=bookingList)
         flash('You have not book any screening', 'info')
         return redirect('/customerDashboard')
+    
+
+@app.route('/cancelBooking/<bookingID>')
+def cancelBooking(bookingID):
+    if 'username' in session:
+        username = session['username'] 
+        
+        user = controller.getUserByUsername(username)
+        result = controller.cancelBooking(user, bookingID)
+        if result:
+          return  jsonify({'success': True, 'message': 'Cancel successful'}), 200
+
 if __name__ == '__main__':
     app.run()
