@@ -8,12 +8,11 @@
       {% endfor %}
     </ul>
   {% endif %}
-  {% endwith %}
+{% endwith %}
 <div class="row mt-4">
 <div class="col-10">
   <form class="d-flex" role="search">        
     <input class="form-control" id="searchInput" type="search" placeholder="Search by title" aria-label="Search" />
-    
   </form>
   <div class="container d-flex justify-content-start">
     <div class="me-3">
@@ -30,7 +29,7 @@
         <select class="form-select" id="genreFilter" >
           <option value="">Choose...</option>
           {% for genre in unique_genres %}
-              <option>{{ genre}}</option>
+            <option>{{ genre}}</option>
           {% endfor %}
         </select>                    
     </div>
@@ -104,7 +103,7 @@
   tabindex="-1"
   role="dialog"
   aria-labelledby="registerModalLabel"
-  aria-hidden="true"
+  aria-hidden="true" data-bs-backdrop="static"
 >
   <!-- Register Form and Fields -->
   <div class="modal-dialog" role="document">
@@ -204,13 +203,13 @@
       .then((response) => response.json())
       .then((data) => {
         if (data.userRole === "admin") {
-          window.location.href = "/adminDashboard"; // 跳转到管理员界面
+          window.location.href = "/adminDashboard"; 
         } else if (data.userRole === "staff") {
-          window.location.href = "/staffDashboard"; // 跳转到员工界面
+          window.location.href = "/staffDashboard";
         } else if (data.userRole === "customer") {
-          window.location.href = "/customerDashboard"; // 跳转到顾客界面
+          window.location.href = "/customerDashboard"; 
         } else {
-          // 处理登录失败的情况
+          
           alert("登录失败，请检查用户名和密码");
         }
       });

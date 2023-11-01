@@ -149,8 +149,12 @@
       .then((response) => response.json())
       .then((data) => {
         if (data.success) {
-          // 如果 promo code 有效，更新金额
-          window.location.href = '/customerDashboard';
+          const userRole = data.userRole;
+          const message = data.message;
+          alert(message)
+          if (userRole === 'Customer'){window.location.href = '/customerDashboard';};
+          if (userRole === 'Staff') {window.location.href = '/staffDashboard';}
+          
         } else {
           console.error('Payment failed:', data.error);
         }

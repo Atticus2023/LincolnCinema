@@ -80,8 +80,7 @@ def login():
         if user.userRole == 'staff':
             return jsonify({'userRole': 'staff'})
 
-        if user.userRole == 'customer':
-            session['bookingList'] = user.bookingList
+        if user.userRole == 'customer':            
             return jsonify({'userRole': 'customer'})
 
     return jsonify({'userRole': 'guest'})
@@ -155,8 +154,23 @@ def addScreening(movieTitle):
 
 @app.route('/staffDashboard')
 def staffDashboard():
-    movies, unique_countries, unique_years, unique_genres = filterData()
-    return render_template('staffDashboard.html', movies=movies, unique_countries=unique_countries,unique_years=unique_years,unique_genres=unique_genres)
+    if 'username' in session:
+        username = session['username']        
+        user = controller.getUserByUsername(username)        
+        movies, unique_countries, unique_years, unique_genres = filterData()
+        if user:           
+            return render_template('staffDashboard.html', user=user, movies=movies, unique_countries=unique_countries,unique_years=unique_years,unique_genres=unique_genres)
+        else:
+            return "User not found"
+    else:
+        return redirect('/login')
+    
+   
+@app.route('/staff/allBookings')
+def staffViewBookings():
+    if 'username' in session:
+        allBookings = controller.bookings
+        return render_template('staffViewBookings.html', allBookings=allBookings) 
 
 @app.route('/customerDashboard')
 def customer_dashboard():
@@ -238,14 +252,17 @@ def hallScreening():
 @app.route('/makeBooking', methods=['GET'])
 def makeBooking():
     if 'username' in session:
-        username = session['username']        
+        username = session['username']       
+        userRole = session['userRole'] 
         screeningID = request.args.get('screeningID')            
         movieID = request.args.get('movieID')
         user = controller.getUserByUsername(username)  
         movie = controller.getMovieByID(movieID)
         screening = controller.getScreeningByID(screeningID) 
-
-        return render_template('makeBooking.html', user=user, movie=movie, screening=screening)
+        if userRole == 'staff':
+            return render_template('staffMakeBooking.html', user=user, movie=movie, screening=screening)
+        elif userRole == 'customer':
+            return render_template('makeBooking.html', user=user, movie=movie, screening=screening)
     else:
         flash('You have not login', 'info')
         return redirect('/')
@@ -261,12 +278,16 @@ def submit_booking():
         for seatID in selectedSeats:
             seat = controller.getSeatByID(seatID,screeningID)
             selectedSeatsList.append(seat)
-
-        username = session['username']
-        user = controller.getUserByUsername(username) 
-        screening = controller.getScreeningByID(screeningID)  
         
-        booking = controller.makeBooking(user, screening, selectedSeatsList)
+        screening = controller.getScreeningByID(screeningID)  
+        if session['userRole'] == 'customer':
+            username = session['username']
+            user = controller.getUserByUsername(username) 
+            booking = controller.makeBooking(user, screening, selectedSeatsList)
+        elif session['userRole'] == 'staff':
+            username = data.get('customerName')            
+            user = controller.getUserByUsername(username)            
+            booking = controller.makeBooking(user, screening, selectedSeatsList)
        
         return jsonify({'message': 'Booking successful','bookingID': booking.id})
 
@@ -319,8 +340,10 @@ def checkout():
     message = f" {customerName} {screening.date} {screening.startTime} {screening.hall.hallID} {bookingSeats} "
     controller.sendNoticeToCustomer(customer, message)
     controller.payment(booking, amount, selectedPaymentMethod, discountCoupon)
-    
-    return jsonify({'success': True, 'message': 'Payment successful'}), 200
+    if session['userRole'] == 'staff':
+        return jsonify({'success': True, 'message': 'Payment successful', 'userRole': 'Staff' }), 200
+    if session['userRole'] == 'customer':
+        return jsonify({'success': True, 'message': 'Payment successful', 'userRole': 'Customer' }), 200
 
 @app.route('/bookingList')
 def bookingList():
@@ -336,15 +359,31 @@ def bookingList():
         return redirect('/customerDashboard')
     
 
-@app.route('/cancelBooking/<bookingID>')
+@app.route('/cancelBooking/<int:bookingID>', methods=['POST'])
 def cancelBooking(bookingID):
-    if 'username' in session:
+    if 'username' in session and session['userRole'] == 'customer':
         username = session['username'] 
-        
+        print('cus========yanzheng11111')
+        print(username)
         user = controller.getUserByUsername(username)
+        print('cus========yanzheng')
+        print(user.username)
         result = controller.cancelBooking(user, bookingID)
-        if result:
-          return  jsonify({'success': True, 'message': 'Cancel successful'}), 200
+
+    elif session['userRole'] == 'staff':
+        data = request.json
+        username = data.get('username')
+        print('staff=========111')
+        print(username)
+        user = controller.getUserByUsername(username)
+        print('staff=========222')
+        print(user.username)
+        result = controller.cancelBooking(user, bookingID)
+
+    if result:
+        return  jsonify({'success': True, 'message': 'Cancel successful'}), 200
+    else:
+        return jsonify({'success': False, 'message': 'error'})
 
 if __name__ == '__main__':
     app.run()

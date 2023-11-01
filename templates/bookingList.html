@@ -34,7 +34,7 @@
         {{seat.id}}
         {% endfor %}
       </td>
-      <td><button class="btn btn-secondary" id="cancelBookingBtn">Cancel</button></td>
+      <td><button class="btn btn-secondary cancelBookingBtn">Cancel</button></td>
     </tr>
     {% set num = num + 1 %}
     {% endfor %}
@@ -45,12 +45,12 @@
 {% block script %}
 <script>
   
-  const cancelBookingButtons = document.querySelectorAll('#cancelBookingBtn');
+  const cancelBookingButtons = document.querySelectorAll('.cancelBookingBtn');
   if (cancelBookingButtons.length > 0) {
-    console.log('len>0');
+    
     cancelBookingButtons.forEach(button => {
-      console.log(button);
-      button.addEventListener('click', (event) => {     
+     
+      button.addEventListener('click', (event) => {             
         const bookingID = event.target.parentElement.parentElement.querySelector('.bookingID').textContent;
         
         fetch(`/cancelBooking/${bookingID}`, {
@@ -65,7 +65,6 @@
       });
     });
     
-
     } else{
       console.log('================');
     }

@@ -261,7 +261,7 @@ class LincolnCinemaController:
      return None
 
   def getUserByUsername(self, username):
-     for user in self.customers:
+     for user in self.users:
         if user.username == username:
            return user
      return None
@@ -352,7 +352,10 @@ class LincolnCinemaController:
      customer.receiveNotice(newNotice)
 
   def cancelBooking(self, customer, bookingID):
+     print(bookingID)
+     print('111111111')
      canceledBooking = self.getBookingByID(bookingID)
+     print(canceledBooking.customer.id)
      for seat in canceledBooking.bookingseats:
         seat.isReserved = False
      self.bookings.remove(canceledBooking)
