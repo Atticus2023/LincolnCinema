@@ -201,6 +201,7 @@ class LincolnCinemaController:
     self.staffs = [user2]
     self.customers = [user3,user4]
     self.movies = [movie1, movie2, movie3, movie4, movie5, movie6, movie7, movie8, movie9, movie10, movie11, movie12, movie13, movie14, movie15]    
+    self.halls = [hall1,hall2,hall3,hall4]
     self.bookings = []
     self.payments = []
     self.discountCoupons = [discountCoupon1,discountCoupon2,discountCoupon3]
@@ -255,8 +256,9 @@ class LincolnCinemaController:
     return None
   
   def getHallByID(self, hallID):
+     print('gethallbyid111111111')
      for hall in self.halls:
-        if hall.hallID == hallID:
+        if hall.hallID == int(hallID):
            return hall
      return None
 
@@ -275,8 +277,12 @@ class LincolnCinemaController:
   
   def getScreeningByID(self, screeningID):    
     for movie in self.movies:
-      for screening in movie.movieScreenings:          
+      print(movie.title)
+      for screening in movie.movieScreenings:    
+          print(screening.date)      
           if screening.id == int(screeningID):
+            print('find screning0------')
+            print(screening.startTime)
             return screening 
     return None
   
@@ -307,8 +313,12 @@ class LincolnCinemaController:
       return False
   
   def addScreening(self, movieTitle, date, startTime, endTime, hallID, price): 
+    
     hall = self.getHallByID(hallID)
-    movie = self.getMovieByID(movieTitle)
+    print('controll111')
+    print(hallID)
+    print(hall.capacity)
+    movie = self.getMovieByTitle(movieTitle)
     new_screening = Screening(movieTitle,date,startTime, endTime, hall, price) 
     if new_screening not in movie.movieScreenings and new_screening not in hall.hallScreenings:
       movie.movieAddScreening(new_screening)
@@ -318,8 +328,11 @@ class LincolnCinemaController:
       return False
   
   def cancelScreening(self, movie, screening):
-    if screening in movie.movieScreenings:
+    hall = screening.hall
+    if screening in movie.movieScreenings and screening in hall.hallScreenings:
       movie.movieScreenings.remove(screening)
+      hall.hallScreenings.remove(screening)
+      
       return True
     else:
       return False
