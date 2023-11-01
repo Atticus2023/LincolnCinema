@@ -24,7 +24,7 @@
           <div class=" text-center">
             <p><span>{{screening.date}} </span><span> Hall: {{screening.hall.hallID}}</span></p>
           <p class="screening-time">Time: {{screening.startTime}}-{{screening.endTime}}</p>          
-          <a href="{{url_for('cancelScreening', screeningID=screening.id)}}"><button class="btn btn-danger">Cancel</button></a>
+          <a href="{{url_for('cancelScreening', screeningID=screening.screeningID)}}"><button class="btn btn-danger">Cancel</button></a>
         </div>
         </div>
       </div>

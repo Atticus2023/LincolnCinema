@@ -137,14 +137,13 @@ def add_movie():
 
 @app.route('/addScreening/<movieTitle>', methods=['GET','POST'])
 def addScreening(movieTitle):    
-    movieTitle = request.args.get('movieTitle')        
+    
     if request.method == 'POST':
         date = request.form.get('date')
         startTime = request.form.get('startTime')
         endTime = request.form.get('endTime')
-        hallID = request.form.get('hallID')            
-        price = request.form.get('price')            
-
+        hallID = request.form.get('hallID')  
+        price = request.form.get('price')    
         result = controller.addScreening(movieTitle,date,startTime, endTime, hallID, price)
         if result:
             flash('Add screening successfully!', 'info')
@@ -188,10 +187,13 @@ def movieDetails():
 @app.route('/cancelScreening/<screeningID>')
 def cancelScreening(screeningID):
     if session['userRole'] == 'admin':
+        # movie = controller.getMovieByID(movieID)
         screening = controller.getScreeningByID(screeningID)
-        result = controller.cancelScreening(screening)
+        movieTitle = screening.movieTitle
+        movie = controller.getMovieByTitle(movieTitle)
+        result = controller.cancelScreening(movie,screening)
         if result:
-            return redirect(url_for('movieDetails'))
+            return redirect(url_for('movieDetails', movieID=movie.id))
     else:
       return redirect('/login')     
     
