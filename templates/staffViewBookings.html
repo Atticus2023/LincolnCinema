@@ -1,0 +1,72 @@
+{% extends 'base.html' %} {% block title %}StaffBookings{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-10 text-light">
+      <table class="table">
+        <thead>
+          <th>No.</th>
+          <th>Customer</th>
+          <th>Booking ID</th>
+          <th>Movie</th>
+          <th>Hall</th>
+          <th>Start Time</th>
+          <th>End Time</th>
+          <th>Cancel</th>
+        </thead>
+        <tbody>
+          {% set num = 1 %}
+          {% for booking in allBookings %}
+          <tr>
+            <td>{{ num }}</td>
+            <td class="username">{{ booking.customer.username }}</td>
+            <td class="bookingID">{{ booking.id }}</td>
+            <td>{{ booking.screening.movieTitle }}</td>
+            <td>{{ booking.screening.hall.hallID }}</td>
+            <td>{{ booking.screening.startTime }}</td>
+            <td>{{ booking.screening.endTime }}</td>            
+            <td><button class="btn btn-secondary cancelBtn">Cancel</button></td>
+          </tr>
+          {% set num =  num + 1 %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script>  
+  const cancelBookingButtons = document.querySelectorAll('.cancelBtn');
+  if (cancelBookingButtons.length > 0) {
+    
+    cancelBookingButtons.forEach(button => {
+     
+      button.addEventListener('click', (event) => {             
+        const bookingID = event.target.parentElement.parentElement.querySelector('.bookingID').textContent;
+        const username = event.target.parentElement.parentElement.querySelector('.username').textContent;
+        fetch(`/cancelBooking/${bookingID}`, {
+          method: 'POST',
+           headers: {
+              'Content-Type': 'application/json' // 设置请求头，指定发送的数据类型为 JSON
+           },
+           body: JSON.stringify({ username: username })
+        })
+          .then(response => {
+            if (response.status === 200) {
+              const bookingRow = event.target.parentElement.parentElement;
+              bookingRow.remove();
+            }
+          });
+      });
+    });
+    
+    } else{
+      console.log('================');
+    }
+  
+
+</script>
+{% endblock %}

@@ -1,5 +1,66 @@
+{% extends 'base.html' %} {% block title %}StaffDashboard{% endblock %}
 
-
+ {% block content %}
+ {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <ul class="flash-messages text-light">
+      {% for category, message in messages %}
+        <li class="{{ category }}">{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+  {% endwith %}
+ <div class="container-fluid mt-4">
+  <div class="row">
+    <div class="col-10">
+      <form class="d-flex" role="search">        
+        <input class="form-control" id="searchInput" type="search" placeholder="Search by title" aria-label="Search" />
+        
+      </form>
+      <div class="container d-flex justify-content-start">
+        <div class="me-3">
+          <label for="country" class="form-label text-light">Country</label>
+            <select class="form-select" id="countryFilter" >
+              <option value="">Choose...</option>                        
+              {% for country in unique_countries %}
+                  <option>{{country}}</option>
+              {% endfor %}
+            </select>                    
+        </div>
+        <div class="me-3">
+          <label for="country" class="form-label text-light">Genre</label>
+            <select class="form-select" id="genreFilter" >
+              <option value="">Choose...</option>
+              {% for genre in unique_genres %}
+                  <option>{{ genre}}</option>
+              {% endfor %}
+            </select>                    
+        </div>
+        <div class="me-3">
+          <label for="country" class="form-label text-light">ReleaseDate</label>
+            <select class="form-select" id="yearFilter" >
+              <option value="">Choose...</option>
+              {% for releaseDate in unique_years %}
+                  <option>{{releaseDate}}</option>
+              {% endfor %}
+            </select>                    
+        </div>
+      </div>
+    </div>
+    <div class="col-2">
+      <div class="btn-group">
+        <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown">
+          {{ user.username }}          
+        </button>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="#">Update Profile</a></li>          
+          <li><a class="dropdown-item" href="/staff/allBookings">All Bookings</a></li>          
+          <li><a class="dropdown-item" href="/logout">Logout</a></li>
+        </ul>
+      </div>
+    </div>             
+  </div>
+ </div>
 
 <div class="moviesListContainer me-5">
   <ul class="moviesList">
@@ -13,13 +74,13 @@
       <div class="container">
         <div class="row">
           <div class="moviesListWrapper col-3">
-            <a href="{{url_for('addScreening', movieID=movie.id)}}" class="moviesListPoster">
+            <a href="/movieScreening?movieID={{ movie.id }}" class="moviesListPoster">
               <img src="{{ movie.imagePath  }}" alt="{{ movie.title }}" />
             </a>
           </div>
           <div class="moviesListCopy col-8">
             <h2 class="moviesListHeading">
-              <a href="#" class="moviesListLink movieTitle text-light">{{ movie.title }}</a>
+              <a href="/movieScreening?movieID={{ movie.id }}" class="moviesListLink movieTitle text-light">{{ movie.title }}</a>
             </h2>
             <p class="text-white-50">
               <span>{{ movie.genre}}</span> <span>{{ movie.duration}}</span> <span>{{ movie.country }}</span>
@@ -32,3 +93,8 @@
     {% endfor %}
   </ul>
 </div>
+
+{% endblock %}
+{% block script %}
+ 
+{% endblock %}
