@@ -152,6 +152,49 @@ def addScreening(movieTitle):
 
     return render_template('addScreening.html', movieTitle = movieTitle)
 
+
+@app.route('/deleteMovie/<movieTitle>')
+def deleteMovie(movieTitle):
+    if session['userRole'] == 'admin':
+        movie = controller.getMovieByTitle(movieTitle)
+        result = controller.deleteMovie(movie)
+        if result:
+            return redirect(url_for('adminDashboard'))
+    else:
+      return redirect('/login')     
+    
+
+@app.route('/movieDetails', methods=['GET'])
+def movieDetails(): 
+    movieID = request.args.get("movieID")  
+    movie = controller.getMovieByID(movieID)        
+    movie_screenings_data = []
+    for screening in movie.movieScreenings:
+        screening_data = {
+            "movieID": movieID,
+            "screeningID": screening.id,
+            "date": screening.date,
+            "startTime": screening.startTime,
+            "endTime": screening.endTime,
+            "hall": {
+                "hallID": screening.hall.hallID,
+                "capacity": screening.hall.capacity                
+            }
+        }
+        movie_screenings_data.append(screening_data)    
+    return render_template('movieDetails.html',   movie=movie, movie_screenings_data=movie_screenings_data)  
+
+  
+@app.route('/cancelScreening/<screeningID>')
+def cancelScreening(screeningID):
+    if session['userRole'] == 'admin':
+        screening = controller.getScreeningByID(screeningID)
+        result = controller.cancelScreening(screening)
+        if result:
+            return redirect(url_for('movieDetails'))
+    else:
+      return redirect('/login')     
+    
 @app.route('/staffDashboard')
 def staffDashboard():
     if 'username' in session:

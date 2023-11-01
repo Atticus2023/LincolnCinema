@@ -302,6 +302,9 @@ class LincolnCinemaController:
   def deleteMovie(self, movie):    
     if movie in self.movies:
       self.movies.remove(movie)
+      return True
+    else:
+      return False
   
   def addScreening(self, movieTitle, date, startTime, endTime, hallID, price): 
     hall = self.getHallByID(hallID)
@@ -317,6 +320,9 @@ class LincolnCinemaController:
   def cancelScreening(self, movie, screening):
     if screening in movie.movieScreenings:
       movie.movieScreenings.remove(screening)
+      return True
+    else:
+      return False
 
   def makeBooking(self, customer, screening, selectedSeats):
     newBooking = Booking(customer, screening)
