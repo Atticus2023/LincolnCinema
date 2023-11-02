@@ -87,10 +87,10 @@
 
     // 遍历筛选后的screenings并显示在页面上
     const screeningsHTML = filteredScreenings.map(screening => `
-      <div class="screening-card text-light col-4">
+      <div class="screening-card text-light col-4">                
         <a href="/makeBooking?screeningID=${screening.screeningID}&movieID=${screening.movieID}">
-          <p class="screening-date">Date: ${screening.date}</p>
-          <p class="screening-time">Time: ${screening.startTime}</p>
+          <p class="screening-date"><i class="fa-solid fa-ticket-simple fa-rotate-90"></i> Hall: ${screening.hall.hallID}</p>
+          <p class="screening-time"> Time: ${screening.startTime}</p>
         </a>
       </div>
     `).join('');

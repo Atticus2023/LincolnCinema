@@ -167,12 +167,13 @@
           </div>
           <div class="moviesListCopy col-8">
             <h2 class="moviesListHeading">
-              <a href="#" class="moviesListLink movieTitle text-light">{{ movie.title }}</a>
+              <a href="/movieScreening?movieID={{ movie.id }}" class="moviesListLink movieTitle text-light">{{ movie.title }}</a>
             </h2>
             <p class="text-white-50">
               <span>{{ movie.genre}}</span> <span>{{ movie.duration}}</span> <span>{{ movie.country }}</span>
             </p>
             <p class="text-white-50">{{ movie.description }}</p>
+            <a href="/movieScreening?movieID={{ movie.id }}"><button class="btn btn-warning">Book Now</button></a>
           </div>
         </div>
       </div>

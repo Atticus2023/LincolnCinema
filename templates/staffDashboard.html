@@ -5,7 +5,7 @@
   {% if messages %}
     <ul class="flash-messages text-light">
       {% for category, message in messages %}
-        <li class="{{ category }}">{{ message }}</li>
+        <li class="{{ category }}"><h2>{{ message }}</h2></li>
       {% endfor %}
     </ul>
   {% endif %}
@@ -89,6 +89,7 @@
               <span>{{ movie.genre}}</span> <span>{{ movie.duration}}</span> <span>{{ movie.country }}</span>
             </p>
             <p class="text-white-50">{{ movie.description }}</p>
+            <a href="/movieScreening?movieID={{ movie.id }}"><button class="btn btn-warning">Book Now</button></a>
           </div>
         </div>
       </div>
