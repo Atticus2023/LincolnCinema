@@ -137,19 +137,20 @@ def add_movie():
 
 @app.route('/addScreening/<movieTitle>', methods=['GET','POST'])
 def addScreening(movieTitle):    
-    
-    if request.method == 'POST':
-        date = request.form.get('date')
-        startTime = request.form.get('startTime')
-        endTime = request.form.get('endTime')
-        hallID = request.form.get('hallID')  
-        price = request.form.get('price')    
-        result = controller.addScreening(movieTitle,date,startTime, endTime, hallID, price)
-        if result:
-            flash('Add screening successfully!', 'info')
-            return redirect(url_for('adminDashboard'))
+    if session['userRole'] == 'admin':
+        if request.method == 'POST':
+            date = request.form.get('date')
+            startTime = request.form.get('startTime')
+            endTime = request.form.get('endTime')
+            hallID = request.form.get('hallID')  
+            price = request.form.get('price')  
+            movie = controller.getMovieByTitle(movieTitle)  
+            result = controller.addScreening(movieTitle,date,startTime, endTime, hallID, price)
+            if result:
+                flash('Add screening successfully!', 'info')
+                return redirect(url_for('movieDetails',movieID=movie.id))
 
-    return render_template('addScreening.html', movieTitle = movieTitle)
+    return redirect('/login')
 
 
 @app.route('/deleteMovie/<movieTitle>')
@@ -165,24 +166,26 @@ def deleteMovie(movieTitle):
 
 @app.route('/movieDetails', methods=['GET'])
 def movieDetails(): 
-    movieID = request.args.get("movieID")  
-    movie = controller.getMovieByID(movieID)        
-    movie_screenings_data = []
-    for screening in movie.movieScreenings:
-        screening_data = {
-            "movieID": movieID,
-            "screeningID": screening.id,
-            "date": screening.date,
-            "startTime": screening.startTime,
-            "endTime": screening.endTime,
-            "hall": {
-                "hallID": screening.hall.hallID,
-                "capacity": screening.hall.capacity                
+    if session['userRole'] == 'admin':
+        movieID = request.args.get("movieID")  
+        movie = controller.getMovieByID(movieID)        
+        movie_screenings_data = []
+        for screening in movie.movieScreenings:
+            screening_data = {
+                "movieID": movieID,
+                "screeningID": screening.id,
+                "date": screening.date,
+                "startTime": screening.startTime,
+                "endTime": screening.endTime,
+                "hall": {
+                    "hallID": screening.hall.hallID,
+                    "capacity": screening.hall.capacity                
+                }
             }
-        }
-        movie_screenings_data.append(screening_data)    
-    return render_template('movieDetails.html',   movie=movie, movie_screenings_data=movie_screenings_data)  
-
+            movie_screenings_data.append(screening_data)    
+        return render_template('movieDetails.html',   movie=movie, movie_screenings_data=movie_screenings_data)  
+    else:
+      return redirect('/login')   
   
 @app.route('/cancelScreening/<screeningID>')
 def cancelScreening(screeningID):
