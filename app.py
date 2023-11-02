@@ -91,17 +91,16 @@ def logout():
     controller.logout
     return redirect(url_for('index'))
 
-@app.route('/search', methods=['GET'])
-def search_movies():
-    title = request.args.get('title')
-    country = request.args.get('country')
-    language = request.args.get('language')
-    genre = request.args.get('genre')
-    releaseDate = request.args.get('releaseDate')
-    
-    matching_movies = controller.searchMovies(title, country, language, genre, releaseDate)
+@app.route('/viewScreenings', methods=['GET'])
+def viewScreenings():
+    movies = controller.movies
+    return render_template('viewScreenings.html', movies = movies)
 
-    return jsonify(matching_movies)
+@app.route('/viewHalls', methods=['GET'])
+def viewHalls():
+    halls = controller.halls
+            
+    return render_template('viewHalls.html', halls = halls)
 
 @app.route('/adminDashboard')
 def adminDashboard():
@@ -138,6 +137,7 @@ def add_movie():
 @app.route('/addScreening/<movieTitle>', methods=['GET','POST'])
 def addScreening(movieTitle):    
     if session['userRole'] == 'admin':
+
         if request.method == 'POST':
             date = request.form.get('date')
             startTime = request.form.get('startTime')
@@ -149,7 +149,7 @@ def addScreening(movieTitle):
             if result:
                 flash('Add screening successfully!', 'info')
                 return redirect(url_for('movieDetails',movieID=movie.id))
-
+        return render_template('addScreening.html',movieTitle=movieTitle)
     return redirect('/login')
 
 
@@ -364,7 +364,7 @@ def validatePromoCode():
     
     if discount:
         discountedAmount = float(amount)*float(discount)
-        print(discountedAmount)
+        
         return jsonify({'valid': True,'discountedAmount': discountedAmount})  
     else:
         return jsonify({'valid': False})  
@@ -410,22 +410,17 @@ def bookingList():
 @app.route('/cancelBooking/<int:bookingID>', methods=['POST'])
 def cancelBooking(bookingID):
     if 'username' in session and session['userRole'] == 'customer':
-        username = session['username'] 
-        print('cus========yanzheng11111')
-        print(username)
+        username = session['username']         
         user = controller.getUserByUsername(username)
-        print('cus========yanzheng')
-        print(user.username)
+        
         result = controller.cancelBooking(user, bookingID)
 
     elif session['userRole'] == 'staff':
         data = request.json
         username = data.get('username')
-        print('staff=========111')
-        print(username)
+        
         user = controller.getUserByUsername(username)
-        print('staff=========222')
-        print(user.username)
+        
         result = controller.cancelBooking(user, bookingID)
 
     if result:

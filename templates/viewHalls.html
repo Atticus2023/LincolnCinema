@@ -1,0 +1,25 @@
+{% extends 'base.html' %} {% block title %}StaffBookings{% endblock %}
+
+{% block content %}
+<div class="moviesListContainer mt-5">
+  
+    {% for hall in halls %}
+      <div class="container">
+        <h2 class="text-light">Hall ID: {{hall.hallID}}</h2>
+      </div>
+      <div class="d-flex flex-row">
+        <div class="row">
+        {% for screening in hall.hallScreenings %}      
+          <div class="col-3 bg-success border border-2 rounded m-1">
+            <div class="text-light">
+              <h6>{{screening.movieTitle}}-Date{{screening.date}}</h6>
+              <p>{{screening.startTime}}-{{screening.endTime}}</p>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+      </div>
+      <hr>
+      {% endfor %}
+    
+{% endblock %}
