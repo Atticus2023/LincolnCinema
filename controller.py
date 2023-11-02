@@ -245,7 +245,8 @@ class LincolnCinemaController:
   
   def getMovieByID(self,movieID):
     for movie in self.movies:
-        requested_id = int(movieID.strip())
+        requested_id = int(movieID)
+        # requested_id = int(movieID.strip())
         if movie.id == requested_id:           
             return movie
     return None
@@ -354,7 +355,7 @@ class LincolnCinemaController:
   def sendNoticeToAll(self,message):
      newNotice = Notification(message)
      self.notifications.append(newNotice)
-     for customer in self.notifications:
+     for customer in self.customers:
         customer.receiveNotice(newNotice)
 
   def sendNoticeToCustomer(self, customer, message):
