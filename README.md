@@ -1,5 +1,5 @@
 # LincolnCinema
- 
+
 ## This is a simple booking movie ticket system
 
 - There 3 roles in this system
@@ -20,3 +20,4 @@
 - password: password
 
 ## Have Fun!!!
+
