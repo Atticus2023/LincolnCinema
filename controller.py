@@ -1,9 +1,9 @@
 from model import  BaseModel, Customer, Admin, Staff, Movie, Hall, Screening, Booking, Payment, DiscountCoupon, Notification
 
-user1 = Admin(  "admin", "111", "John", "Smith", "1 Lincoln Rd", "admin@lincoln.com", "0211234561")
-user2 = Staff( "staff", "111", "Moon", "Smith", "2 Lincoln Rd", "staff@lincoln.com", "0211234562")
-user3 = Customer( "customer1", "111", "Jim", "Smith", "3 Lincoln Rd", "customer1@lincoln.com", "0211234563")
-user4 = Customer( "customer2", "111", "Tom", "Smith", "4 Lincoln Rd", "customer2@lincoln.com", "0211234564")
+user1 = Admin(  "admin", "password", "John", "Smith", "1 Lincoln Rd", "admin@lincoln.com", "0211234561")
+user2 = Staff( "staff", "password", "Moon", "Smith", "2 Lincoln Rd", "staff@lincoln.com", "0211234562")
+user3 = Customer( "customer1", "password", "Jim", "Smith", "3 Lincoln Rd", "customer1@lincoln.com", "0211234563")
+user4 = Customer( "customer2", "password", "Tom", "Smith", "4 Lincoln Rd", "customer2@lincoln.com", "0211234564")
 
 hall1 = Hall(1, 120)
 hall2 = Hall(2, 90)

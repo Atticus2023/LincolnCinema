@@ -12,8 +12,8 @@
         {% for screening in hall.hallScreenings %}      
           <div class="col-3 bg-success border border-2 rounded m-1">
             <div class="text-light">
-              <h6>{{screening.movieTitle}}-Date{{screening.date}}</h6>
-              <p>{{screening.startTime}}-{{screening.endTime}}</p>
+              <h6>{{screening.movieTitle}}</h6>
+              <p>Date:{{screening.date}} {{screening.startTime}}-{{screening.endTime}}</p>
             </div>
           </div>
         {% endfor %}
