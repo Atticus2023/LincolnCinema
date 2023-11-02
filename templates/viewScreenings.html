@@ -1,0 +1,51 @@
+{% extends 'base.html' %} {% block title %}StaffBookings{% endblock %}
+
+{% block content %}
+<div class="moviesListContainer me-5">
+  <ul class="moviesList">
+    {% for movie in movies %}
+    <li
+      class="moviesListItem mt-3"
+      data-year="{{ movie.releaseDate }}"
+      data-country="{{ movie.country }}"
+      data-genre="{{ movie.genre }}"
+    >
+      <div class="container">
+        <div class="row">
+          <div class="moviesListWrapper col-3">
+            <a href="/movieScreening?movieID={{ movie.id }}" class="moviesListPoster">
+              <img src="{{ movie.imagePath  }}" alt="{{ movie.title }}" />
+            </a>
+          </div>
+          <div class="moviesListCopy col-8">
+            <h2 class="moviesListHeading">
+              <a href="/movieScreening?movieID={{ movie.id }}" class="moviesListLink movieTitle text-light">{{ movie.title }}</a>
+            </h2>
+            <p class="text-white-50">
+              <span>{{ movie.genre}}</span> <span>{{ movie.duration}}</span> <span>{{ movie.country }}</span>
+            </p>
+            <p class="text-white-50">{{ movie.description }}</p>
+            <p class="text-white-50">Ticket&Times</p>
+            <div class="d-flex flex-row">
+              <div class="row">
+            {% for screening in movie.movieScreenings %}
+                
+              <div class="col-3 bg-denger border border-2 rounded m-1">
+                <div class="text-light">
+                  <h6>{{screening.date}}-Hall{{screening.hall.hallID}}</h6>
+                  <p>{{screening.startTime}}-{{screening.endTime}}</p>
+                                  
+                </div>
+              </div>
+              
+            {% endfor %}
+            </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}
